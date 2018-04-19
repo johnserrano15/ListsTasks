@@ -2,19 +2,20 @@ import React, { Component } from 'react';
 import TasksLayout from '../../tasks/components/tasks-layout';
 import AddTask from '../components/addTask';
 import ListTasks from '../components/listTasks';
-
+import { TasksContext } from './taskContext';
 class Tasks extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       modalVisible: false,
       items: [],
       value: '',
       shouldHide: 0,
-    }
+      title: 'Hola mundo'
+    };
   }
 
-  handleAddtask = (event) => {
+  handleAddtask = event => {
     event.preventDefault();
     // console.log(this.input.value, 'submit');
     if (!this.input.value.length) {
@@ -28,51 +29,51 @@ class Tasks extends Component {
 
     this.setState(prevState => ({
       items: prevState.items.concat(newItem),
-      shouldHide: 0,
+      shouldHide: 0
     }));
 
     this.input.value = '';
-  }
+  };
 
-  setInputref = (element) => {
+  setInputref = element => {
     this.input = element;
-  }
+  };
 
-  handleDeleteTask = (id) => {
+  handleDeleteTask = id => {
     // console.log(id)
     const items = this.state.items;
     // console.info(items);
-    // Limpiando array sin mutar el array siendo -> inmutable 
-    const newItems = items.filter( e => e.id !== id);
+    // Limpiando array sin mutar el array siendo -> inmutable
+    const newItems = items.filter(e => e.id !== id);
     // console.log(newItems)
 
     this.setState({
       items: newItems
     });
-  }
+  };
 
   handleUpdateTask = (id, text) => {
     // console.log('Hola update', id)
     // console.info(this.inputUpdate.value)
     this.setState({
       shouldHide: id,
-      value: text,
+      value: text
     });
-  }
+  };
 
-  setInputUpdateRef = (element) => {
+  setInputUpdateRef = element => {
     this.inputUpdate = element;
-  }
+  };
 
-  handleChange = (event) => {
+  handleChange = event => {
     // console.log('modificando');
     this.setState({
       // value: event.target.value,
-      value: this.inputUpdate.value,
-    })
-  }
+      value: this.inputUpdate.value
+    });
+  };
 
-  handleSubmitUpdate = (event) => {
+  handleSubmitUpdate = event => {
     event.preventDefault();
     // console.log(event.target.idTask.value)
     const items = this.state.items;
@@ -81,8 +82,8 @@ class Tasks extends Component {
     const newItems = items.map(e => {
       // console.log(e)
       // console.info(id)
-      if(e.id == id) {
-        e.text = this.inputUpdate.value
+      if (e.id == id) {
+        e.text = this.inputUpdate.value;
       }
       return e;
     });
@@ -93,30 +94,47 @@ class Tasks extends Component {
       items: newItems,
       shouldHide: 0
     });
-  }
+  };
 
   render() {
     return (
       <TasksLayout>
-        <AddTask
-          setRef={this.setInputref}
-          handleAddtask={this.handleAddtask}
-        />
-        <h3>Hola mundo {this.props.name}</h3>
-        <p>Agregar la siguiente task {this.state.items.length + 2}</p>
-        <ListTasks 
-          items={this.state.items} 
-          handleUpdateTask={this.handleUpdateTask} 
-          handleDeleteTask={this.handleDeleteTask}
-          handleChange={this.handleChange}
-          setRef={this.setInputUpdateRef}
-          value={this.state.value}
-          shouldHide={this.state.shouldHide}
-          handleSubmitUpdate={this.handleSubmitUpdate}
-        />
+        <TasksContext.Provider value={{ state: this.state }}>
+          <AddTask
+            setRef={this.setInputref}
+            handleAddtask={this.handleAddtask}
+          />
+          <h3>Hola mundo {this.props.name}</h3>
+          <p>Agregar la siguiente task {this.state.items.length + 2}</p>
+          <ListTasks
+            handleUpdateTask={this.handleUpdateTask}
+            handleDeleteTask={this.handleDeleteTask}
+            handleChange={this.handleChange}
+            setRef={this.setInputUpdateRef}
+            value={this.state.value}
+            shouldHide={this.state.shouldHide}
+            handleSubmitUpdate={this.handleSubmitUpdate}
+          />
+          <Prueba />
+        </TasksContext.Provider>
       </TasksLayout>
-    )
+    );
   }
+}
+
+function Prueba(props) {
+  return (
+    <div>
+      <TasksContext.Consumer>
+        {context => (
+          <p>
+            {context.state.title}
+            {props.handleAddtask}
+          </p>
+        )}
+      </TasksContext.Consumer>
+    </div>
+  );
 }
 
 export default Tasks;
